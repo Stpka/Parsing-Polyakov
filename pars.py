@@ -3,13 +3,6 @@ from bs4 import BeautifulSoup
 import requests
 
 
-
-p = requests.get("https://kpolyakov.spb.ru/cms/images/4841.gif")
-out = open("test.html", "wb")
-out.write(p.content)
-out.close()
-
-
 tasks=[  [],
 		 [],
 		 [],
@@ -41,8 +34,21 @@ tasks=[  [],
 		 [145, "Сколько чисел можно составить при заданных ограничениях?"]]
 
 		  ]
+		  
 questions = []
 answers=[]
+
+
+def GenerateImg(number_of_task):
+	url = f'https://kpolyakov.spb.ru/cms/images/{number_of_task}.gif'
+	get = requests.get(url)
+
+	name_of_task = f"{number_of_task}.html"
+	out = open(name_of_task, "wb")
+	
+	out.write(p.content)
+	out.close()
+	return name_of_task
 
 
 def GenerateTasks(number_of_task, section):
@@ -63,6 +69,7 @@ def setup():
 	soup = BeautifulSoup(page.text, "html.parser")				# Начинаем парсить
 	questions = soup.findAll('td', class_='topicview')
 	answers = soup.findAll('div', class_='hidedata')
+	print(questions)
 
 	for number in range(int(input("Сколько задач хотите сгенерировать?: "))):
 		AnswerAndQuestion(questions, answers, number, left_slice, right_slice)
@@ -77,4 +84,5 @@ def AnswerAndQuestion(questions, answers, number, left_slice, right_slice):
 
 
 setup()
+
 
