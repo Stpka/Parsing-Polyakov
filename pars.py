@@ -10,7 +10,7 @@ tasks=[  [],
 		 [[158,-23],
 		 [169, "Базы данных: поиск в электронной таблице"]],
 
-		 [[110,-23],
+		 [[109,-23],
          [21, "Сокращение двоичного кода"],
 		 [22, "Выбор кода для одной буквы"],
 		 [23, "Помехоустойчивые коды"],
@@ -41,14 +41,19 @@ answers=[]
 
 def GenerateImg(number_of_task):
 	url = f'https://kpolyakov.spb.ru/cms/images/{number_of_task}.gif'
+	#print(url)
 	get = requests.get(url)
 
-	name_of_task = f"{number_of_task}.html"
+	name_of_task = f"{number_of_task}.jpg"
 	out = open(name_of_task, "wb")
 	
-	out.write(p.content)
+	out.write(get.content)
 	out.close()
 	return name_of_task
+
+
+GenerateImg(4282)
+
 
 
 def GenerateTasks(number_of_task, section):
@@ -69,7 +74,7 @@ def setup():
 	soup = BeautifulSoup(page.text, "html.parser")				# Начинаем парсить
 	questions = soup.findAll('td', class_='topicview')
 	answers = soup.findAll('div', class_='hidedata')
-	print(questions)
+	#print(questions)
 
 	for number in range(int(input("Сколько задач хотите сгенерировать?: "))):
 		AnswerAndQuestion(questions, answers, number, left_slice, right_slice)
@@ -84,5 +89,4 @@ def AnswerAndQuestion(questions, answers, number, left_slice, right_slice):
 
 
 setup()
-
 
