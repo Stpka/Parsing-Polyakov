@@ -4,7 +4,7 @@ import requests
 
 
 tasks=[  [],
-		 [[108,-23, -156, -154],
+		 [[108,-23, 59, 61],
 		 [12, "Оптимальный маршрут по весовой матрице"],
 		 [13, "Сопоставление вершин графа и весовой матрицы"]],
 		 
@@ -96,8 +96,8 @@ def setup():
 
 def AnswerAndQuestion(questions, answers, number, left_slice, right_slice, img_left, img_right):
 	if img_left != 0:
-		#print(img_left, img_right)
-		#print(str(questions[number])[img_left:img_right])
+		print(img_left, img_right)
+		print(str(questions[number])[img_left:img_right])
 		number_of_task = int(str(questions[number])[img_left:img_right]) # Парсим номер задачи
 		#sprint(number_of_task)
 		GenerateImg(number_of_task)
@@ -111,4 +111,3 @@ def AnswerAndQuestion(questions, answers, number, left_slice, right_slice, img_l
 
 
 setup()
-
