@@ -4,10 +4,13 @@ import requests
 
 
 tasks=[  [],
-		 [],
+		 [[108,-23, -156, -154],
+		 [12, "Оптимальный маршрут по весовой матрице"],
+		 [13, "Сопоставление вершин графа и весовой матрицы"]],
+		 
 		 [],
 
-		 [[158,-23],
+		 [[110,-23, 859, 863],
 		 [169, "Базы данных: поиск в электронной таблице"]],
 
 		 [[109,-23],
@@ -52,10 +55,6 @@ def GenerateImg(number_of_task):
 	return name_of_task
 
 
-GenerateImg(4282)
-
-
-
 def GenerateTasks(number_of_task, section):
 	url = f"https://kpolyakov.spb.ru/school/ege/gen.php?action=viewAllEgeNo&egeId={number_of_task}&cat{section}=on"
 	print(url)
@@ -69,6 +68,19 @@ def setup():
 
 	print(tasks[task])
 	number_of_section = int(input("Введите номер раздела: "))
+
+	STATE = 0
+	if number_of_section == 169:
+		img_left = tasks[3][0][-2]	#Срезы для парсинга номера фото
+		img_right = tasks[3][0][-1]
+
+	elif number_of_section == 12:
+		img_left = tasks[1][0][-2]	#Срезы для парсинга номера фото
+		img_right = tasks[1][0][-1]
+
+	else:
+		img_right, img_left = 0,0
+
 	page = requests.get(GenerateTasks(task,number_of_section)) 	# Создаём страницу
 	
 	soup = BeautifulSoup(page.text, "html.parser")				# Начинаем парсить
@@ -76,11 +88,21 @@ def setup():
 	answers = soup.findAll('div', class_='hidedata')
 	#print(questions)
 
+
+
 	for number in range(int(input("Сколько задач хотите сгенерировать?: "))):
-		AnswerAndQuestion(questions, answers, number, left_slice, right_slice)
+		AnswerAndQuestion(questions, answers, number, left_slice, right_slice, img_left, img_right)
 
 
-def AnswerAndQuestion(questions, answers, number, left_slice, right_slice):
+def AnswerAndQuestion(questions, answers, number, left_slice, right_slice, img_left, img_right):
+	if img_left != 0:
+		#print(img_left, img_right)
+		#print(str(questions[number])[img_left:img_right])
+		number_of_task = int(str(questions[number])[img_left:img_right]) # Парсим номер задачи
+		#sprint(number_of_task)
+		GenerateImg(number_of_task)
+
+
 	print(str(questions[number])[left_slice:right_slice])
 	print()
 	print(str(answers[number])[80:-23])
