@@ -1,16 +1,16 @@
 import requests
 from bs4 import BeautifulSoup
-import requests
+import re
 
 
 tasks=[  [],
-		 [[108,-23, 59, 61],
+		 [[108,-23],
 		 [12, "Оптимальный маршрут по весовой матрице"],
 		 [13, "Сопоставление вершин графа и весовой матрицы"]],
 		 
 		 [],
 
-		 [[110,-23, 859, 863],
+		 [[110,-23],
 		 [169, "Базы данных: поиск в электронной таблице"]],
 
 		 [[109,-23],
@@ -42,6 +42,17 @@ questions = []
 answers=[]
 
 
+
+def find_thing(string):
+	if re.search(r"№&nbsp;", string).end() > 0: # Если в задаче есть картинка, то мы ее парсим
+
+		resStart  = re.search(r"№&nbsp;", string).end() # Берём начальные срезы для номера задачи
+		resFinish = re.search(r" ' ", string).start()-1
+		out = int(string[resStart:resFinish]) 			# Парсим номер зная срезы
+		return out
+
+
+
 def GenerateImg(number_of_task):
 	url = f'https://kpolyakov.spb.ru/cms/images/{number_of_task}.gif'
 	#print(url)
@@ -62,6 +73,8 @@ def GenerateTasks(number_of_task, section):
 
 
 def setup():
+	STATE = 1 # Нормальное состояние
+
 	task = int(input("Какой номер вы хотите проработать?: "))
 	left_slice=tasks[task][0][0]	# Генерируем срезы для этого номера
 	right_slice=tasks[task][0][1]
@@ -69,45 +82,39 @@ def setup():
 	print(tasks[task])
 	number_of_section = int(input("Введите номер раздела: "))
 
-	STATE = 0
-	if number_of_section == 169:
-		img_left = tasks[3][0][-2]	#Срезы для парсинга номера фото
-		img_right = tasks[3][0][-1]
-
-	elif number_of_section == 12:
-		img_left = tasks[1][0][-2]	#Срезы для парсинга номера фото
-		img_right = tasks[1][0][-1]
-
-	else:
-		img_right, img_left = 0,0
+	if number_of_section == 169:	STATE = 0
+	# Так как в этом разделе используются одна и таже каинка, то спрасим ее сразу здесь единажды
 
 	page = requests.get(GenerateTasks(task,number_of_section)) 	# Создаём страницу
 	
 	soup = BeautifulSoup(page.text, "html.parser")				# Начинаем парсить
 	questions = soup.findAll('td', class_='topicview')
 	answers = soup.findAll('div', class_='hidedata')
-	#print(questions)
+	print(questions)
 
 
 
 	for number in range(int(input("Сколько задач хотите сгенерировать?: "))):
-		AnswerAndQuestion(questions, answers, number, left_slice, right_slice, img_left, img_right)
+		AnswerAndQuestion(questions, answers, number, left_slice, right_slice, STATE)
 
 
-def AnswerAndQuestion(questions, answers, number, left_slice, right_slice, img_left, img_right):
-	if img_left != 0:
-		print(img_left, img_right)
-		print(str(questions[number])[img_left:img_right])
-		number_of_task = int(str(questions[number])[img_left:img_right]) # Парсим номер задачи
-		#sprint(number_of_task)
-		GenerateImg(number_of_task)
+def AnswerAndQuestion(questions, answers, number, left_slice, right_slice, STATE):
+	if STATE == 0 : 
+		GenerateImg(4282)
+		print(str(questions[number])[left_slice:right_slice])
+		print()
+		print(str(answers[number])[80:-23])
+		print('=============')
+		print()
 
+	else:
+		GenerateImg(find_thing(str(questions[number])))
 
-	print(str(questions[number])[left_slice:right_slice])
-	print()
-	print(str(answers[number])[80:-23])
-	print('=============')
-	print()
+		print(str(questions[number])[left_slice:right_slice])
+		print()
+		print(str(answers[number])[80:-23])
+		print('=============')
+		print()
 
 
 setup()
